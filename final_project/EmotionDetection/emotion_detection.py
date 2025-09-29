@@ -13,18 +13,29 @@ def emotion_detector(text_to_analyse):
     # Format the response into a json
     formatted_response = json.loads(response.text)
 
-    # Extract the emotions from the response
-    emotions_dict = formatted_response['emotionPredictions'][0]['emotion']
+    # Handle invalid 400 responses
+    if response.status_code == 400:
+        emotions_dict = {
+            "anger": None,
+            "disgust": None,
+            "fear": None,
+            "joy": None,
+            "sadness": None,
+            "dominant_emotion": None
+        }
+    elif response.status_code == 200:
+        # Extract the emotions from the response
+        emotions_dict = formatted_response['emotionPredictions'][0]['emotion']
 
-    # Find the highest scored emotion
-    dominant_emotion = ''
-    max_val = 0
-    for key,value in emotions_dict.items():
-        if value > max_val:
-            max_val = value
-            dominant_emotion = key
-    
-    # Add the dominant emotion to the response dictionary
-    emotions_dict['dominant_emotion'] = dominant_emotion
+        # Find the highest scored emotion
+        dominant_emotion = ''
+        max_val = 0
+        for key,value in emotions_dict.items():
+            if value > max_val:
+                max_val = value
+                dominant_emotion = key
+        
+        # Add the dominant emotion to the response dictionary
+        emotions_dict['dominant_emotion'] = dominant_emotion
 
     return emotions_dict
